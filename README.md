@@ -10,9 +10,6 @@ An extension of the classic OpenGL texture mapping demo. A 2×2 red/yellow check
 - **L / R** — move left / right
 - **+ / -** — zoom in / out
 
-### Screenshot
-![Textured Triangles](screenshots/checkered.png)
-
 ---
 
 ## Part 2: Color Cube Flyby
@@ -29,10 +26,10 @@ An extension of the RGB colour cube flyby. The camera orbits the cube along a pa
 - Two vertical wall planes (cyan-tinted left, magenta-tinted right)
 - Cubes bounce between the walls
 
-### Screenshot
-![Color Cube Flyby](screenshots/colorcube.png)
-
 ---
+
+## Video Link
+https://www.loom.com/share/6004a12563b04cafafe411ccede6a9bf
 
 ## Build Instructions
 
