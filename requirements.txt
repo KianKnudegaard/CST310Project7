@@ -1,0 +1,65 @@
+===============================================================
+  GLUTProject — Software Requirements & Run Instructions
+  Part 1: Textured Triangles  |  Part 2: Color Cube Flyby
+===============================================================
+
+AUTHOR  : Kian Knudegaard
+COURSE  : [Course Name / Number]
+DATE    : [Submission Date]
+
+---------------------------------------------------------------
+SOFTWARE REQUIREMENTS
+---------------------------------------------------------------
+  - Windows 10/11
+  - CMake 3.20+
+  - vcpkg (https://github.com/microsoft/vcpkg)
+  - C++17 compiler (MSVC 2022)
+  - OpenGL + GLU (included with Windows)
+  - freeglut (installed via vcpkg)
+
+vcpkg package required:
+  freeglut
+  Install with: .\vcpkg install freeglut
+
+---------------------------------------------------------------
+BUILD INSTRUCTIONS
+---------------------------------------------------------------
+  1. Install freeglut via vcpkg:
+       cd C:\Users\kianj\vcpkg
+       .\vcpkg install freeglut
+
+  2. Open the GLUTProject folder in Visual Studio 2022
+     (it detects CMakePresets.json automatically)
+
+  3. Build -> Build All
+
+---------------------------------------------------------------
+RUNNING
+---------------------------------------------------------------
+  CheckeredTriangles.exe  — Part 1: Textured spinning triangles
+  ColorCubeFlyby.exe      — Part 2: RGB cube flyby with extras
+
+---------------------------------------------------------------
+CONTROLS — CheckeredTriangles.exe
+---------------------------------------------------------------
+  P       — Pause spinning
+  C       — Continue spinning
+  U       — Move image up
+  D       — Move image down
+  L       — Move image left
+  R       — Move image right
+  +       — Zoom in
+  -       — Zoom out
+  ESC     — Quit
+
+---------------------------------------------------------------
+CONTROLS — ColorCubeFlyby.exe
+---------------------------------------------------------------
+  R       — Toggle Y-axis rotation of whole scene
+  S       — Stop flyby animation
+  C       — Continue flyby animation
+  U       — Move scene up (only while stopped)
+  D       — Move scene down (only while stopped)
+  +       — Zoom in
+  -       — Zoom out
+  ESC     — Quit
