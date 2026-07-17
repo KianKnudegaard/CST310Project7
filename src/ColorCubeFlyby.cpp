@@ -1,21 +1,3 @@
-// =============================================================================
-// ColorCubeFlyby.cpp  —  Part 2
-//
-// Original: animated flyby around an RGB colour cube.
-//
-// Added features:
-//   R       — rotate the whole image (toggle Y-axis rotation)
-//   S       — stop the flyby animation
-//   C       — continue flyby animation
-//   U       — move scene up (while stopped)
-//   D       — move scene down (while stopped)
-//   +       — zoom in
-//   -       — zoom out
-//   Three extra cubes (different colors, positions, brightness)
-//   Two vertical wall planes (left and right)
-//   Cubes bounce between the two planes
-// =============================================================================
-
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
 #else
@@ -23,9 +5,6 @@
 #endif
 #include <cmath>
 
-// -----------------------------------------------------------------------------
-// Original RGB cube geometry
-// -----------------------------------------------------------------------------
 namespace Cube {
     const int NUM_VERTICES = 8;
     const int NUM_FACES    = 6;
@@ -43,7 +22,6 @@ namespace Cube {
         {1,0,0},{1,0,1},{1,1,0},{1,1,1}
     };
 
-    // Draw a cube scaled to 'size', at origin. Colors from vertexColors.
     void draw(float brightness = 1.0f) {
         glBegin(GL_QUADS);
         for (int i = 0; i < NUM_FACES; i++) {
@@ -57,10 +35,6 @@ namespace Cube {
     }
 }
 
-// -----------------------------------------------------------------------------
-// Extra cube: draws a unit cube with a single flat color and brightness.
-// Used for the three additional cubes.
-// -----------------------------------------------------------------------------
 void drawColorCube(float r, float g, float b, float brightness) {
     float R=r*brightness, G=g*brightness, B=b*brightness;
     glBegin(GL_QUADS);
@@ -91,9 +65,6 @@ void drawColorCube(float r, float g, float b, float brightness) {
     glEnd();
 }
 
-// -----------------------------------------------------------------------------
-// Draw a vertical plane (a large quad) as a wall.
-// -----------------------------------------------------------------------------
 void drawWall(float x, float r, float g, float b) {
     glBegin(GL_QUADS);
         glColor3f(r, g, b);
@@ -104,58 +75,43 @@ void drawWall(float x, float r, float g, float b) {
     glEnd();
 }
 
-// -----------------------------------------------------------------------------
-// State
-// -----------------------------------------------------------------------------
-static float  g_u        = 0.0f;    // flyby parameter
-static bool   g_flying   = true;    // flyby on/off
-static bool   g_rotating = false;   // extra Y rotation on/off
-static float  g_rotAngle = 0.0f;    // Y rotation angle
-static float  g_offsetY  = 0.0f;    // vertical offset (when stopped)
-static float  g_zoom     = 1.0f;    // zoom
+static float  g_u        = 0.0f;    
+static bool   g_flying   = true;   
+static bool   g_rotating = false;   
+static float  g_rotAngle = 0.0f;   
+static float  g_offsetY  = 0.0f;    
+static float  g_zoom     = 1.0f;    
 
-// Bouncing cube state
-// Three extra cubes each with a position and X velocity
 static float g_cubeX[3]  = { -2.0f, 0.5f, 2.0f };
 static float g_cubeVX[3] = {  0.03f,-0.02f, 0.025f };
 const  float WALL_LEFT    = -3.5f;
 const  float WALL_RIGHT   =  3.5f;
 
-// -----------------------------------------------------------------------------
-// display
-// -----------------------------------------------------------------------------
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
 
-    // Apply zoom, vertical offset, and optional extra rotation
     glScalef(g_zoom, g_zoom, g_zoom);
     glTranslatef(0.0f, g_offsetY, 0.0f);
     if (g_rotating)
         glRotatef(g_rotAngle, 0.0f, 1.0f, 0.0f);
 
-    // Original RGB cube at origin
     Cube::draw(1.0f);
 
-    // Left wall (semi-transparent cyan tint)
     drawWall(WALL_LEFT,  0.3f, 0.6f, 0.6f);
 
-    // Right wall (semi-transparent magenta tint)
     drawWall(WALL_RIGHT, 0.6f, 0.3f, 0.6f);
 
-    // Extra cube 1 — cyan, full brightness, bouncing
     glPushMatrix();
     glTranslatef(g_cubeX[0], -1.5f, 0.3f);
     drawColorCube(0.0f, 1.0f, 1.0f, 1.0f);
     glPopMatrix();
 
-    // Extra cube 2 — magenta, reduced brightness (0.6), bouncing
     glPushMatrix();
     glTranslatef(g_cubeX[1], 1.0f, 0.5f);
     drawColorCube(1.0f, 0.0f, 1.0f, 0.6f);
     glPopMatrix();
 
-    // Extra cube 3 — orange, high brightness (1.2 clamped in shader), bouncing
     glPushMatrix();
     glTranslatef(g_cubeX[2], -0.5f, -0.5f);
     drawColorCube(1.0f, 0.5f, 0.0f, 1.2f);
@@ -166,9 +122,6 @@ void display() {
     glutSwapBuffers();
 }
 
-// -----------------------------------------------------------------------------
-// timer: advances flyby, rotation, and bouncing cubes at ~60 fps.
-// -----------------------------------------------------------------------------
 void timer(int v) {
     if (g_flying) {
         g_u += 0.01f;
@@ -178,7 +131,6 @@ void timer(int v) {
             0.5f, 0.5f, 0.5f,
             cos(g_u), 1.0f, 0.0f
         );
-        // Bounce the three extra cubes between the walls
         for (int i = 0; i < 3; i++) {
             g_cubeX[i] += g_cubeVX[i];
             if (g_cubeX[i] < WALL_LEFT + 0.5f) { g_cubeX[i] = WALL_LEFT + 0.5f; g_cubeVX[i] = fabsf(g_cubeVX[i]); }
@@ -195,17 +147,14 @@ void timer(int v) {
     glutTimerFunc(1000 / 60, timer, v);
 }
 
-// -----------------------------------------------------------------------------
-// keyboard
-// -----------------------------------------------------------------------------
 void keyboard(unsigned char key, int /*x*/, int /*y*/) {
     const float MOVE_STEP = 0.1f;
     const float ZOOM_STEP = 0.1f;
 
     switch (key) {
-        case 'r': case 'R': g_rotating = !g_rotating; break;    // toggle rotation
-        case 's': case 'S': g_flying   = false; break;           // stop
-        case 'c': case 'C': g_flying   = true;  break;           // continue
+        case 'r': case 'R': g_rotating = !g_rotating; break;    
+        case 's': case 'S': g_flying   = false; break;         
+        case 'c': case 'C': g_flying   = true;  break;           
         case 'u': case 'U':
             if (!g_flying) g_offsetY += MOVE_STEP;
             break;
@@ -220,9 +169,6 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/) {
     glutPostRedisplay();
 }
 
-// -----------------------------------------------------------------------------
-// reshape
-// -----------------------------------------------------------------------------
 void reshape(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -231,17 +177,11 @@ void reshape(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-// -----------------------------------------------------------------------------
-// init
-// -----------------------------------------------------------------------------
 void init() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 }
 
-// -----------------------------------------------------------------------------
-// main
-// -----------------------------------------------------------------------------
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
