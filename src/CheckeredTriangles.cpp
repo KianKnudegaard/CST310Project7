@@ -1,20 +1,3 @@
-// =============================================================================
-// CheckeredTriangles.cpp  —  Part 1
-//
-// Original: textured triangles using a 2x2 checkered pattern.
-//
-// Added features:
-//   Spin 360 degrees continuously via timer
-//   P       — pause spinning
-//   C       — continue spinning
-//   U       — move image up
-//   D       — move image down
-//   L       — move image left
-//   R       — move image right
-//   +       — zoom in
-//   -       — zoom out
-// =============================================================================
-
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
 #else
@@ -22,28 +5,18 @@
 #endif
 #include <cstdlib>
 
-// -----------------------------------------------------------------------------
-// Texture: 2x2 red/yellow checkered pattern
-// -----------------------------------------------------------------------------
 #define red     {0xff, 0x00, 0x00}
 #define yellow  {0xff, 0xff, 0x00}
 GLubyte texture[][3] = {
     red, yellow,
     yellow, red,
 };
+static float g_angle    = 0.0f;
+static bool  g_spinning = true; 
+static float g_offsetX  = 0.0f;  
+static float g_offsetY  = 0.0f; 
+static float g_zoom     = 1.0f;   
 
-// -----------------------------------------------------------------------------
-// State variables
-// -----------------------------------------------------------------------------
-static float g_angle    = 0.0f;   // current rotation angle (degrees)
-static bool  g_spinning = true;   // true = spinning, false = paused
-static float g_offsetX  = 0.0f;   // horizontal translation
-static float g_offsetY  = 0.0f;   // vertical translation
-static float g_zoom     = 1.0f;   // zoom scale factor
-
-// -----------------------------------------------------------------------------
-// reshape: fixes camera and uploads texture on window resize.
-// -----------------------------------------------------------------------------
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -67,17 +40,13 @@ void reshape(int width, int height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-// -----------------------------------------------------------------------------
-// display: clears and draws three textured triangles with current transforms.
-// -----------------------------------------------------------------------------
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
 
-    // Apply zoom, translation, and rotation to the entire scene
     glScalef(g_zoom, g_zoom, g_zoom);
     glTranslatef(g_offsetX, g_offsetY, 0.0f);
-    glRotatef(g_angle, 0.0f, 0.0f, 1.0f);   // spin around Z axis
+    glRotatef(g_angle, 0.0f, 0.0f, 1.0f);  
 
     glBegin(GL_TRIANGLES);
         glTexCoord2f(0.5, 1.0);  glVertex2f(-3,  3);
@@ -97,12 +66,9 @@ void display() {
     glFlush();
 }
 
-// -----------------------------------------------------------------------------
-// timer: advances spin angle and requests a redraw at ~60 fps.
-// -----------------------------------------------------------------------------
 void timer(int v) {
     if (g_spinning) {
-        g_angle += 2.0f;            // 2 degrees per frame
+        g_angle += 2.0f;            
         if (g_angle >= 360.0f)
             g_angle -= 360.0f;
         glutPostRedisplay();
@@ -110,31 +76,25 @@ void timer(int v) {
     glutTimerFunc(1000 / 60, timer, v);
 }
 
-// -----------------------------------------------------------------------------
-// keyboard: handles all key inputs.
-// -----------------------------------------------------------------------------
 void keyboard(unsigned char key, int /*x*/, int /*y*/) {
     const float MOVE_STEP = 0.2f;
     const float ZOOM_STEP = 0.1f;
 
     switch (key) {
-        case 'p': case 'P': g_spinning = false; break;          // pause
-        case 'c': case 'C': g_spinning = true;  break;          // continue
-        case 'u': case 'U': g_offsetY += MOVE_STEP; break;      // up
-        case 'd': case 'D': g_offsetY -= MOVE_STEP; break;      // down
-        case 'l': case 'L': g_offsetX -= MOVE_STEP; break;      // left
-        case 'r': case 'R': g_offsetX += MOVE_STEP; break;      // right
-        case '+': g_zoom += ZOOM_STEP; break;                    // zoom in
-        case '-': g_zoom = (g_zoom > ZOOM_STEP) ?               // zoom out
+        case 'p': case 'P': g_spinning = false; break;          
+        case 'c': case 'C': g_spinning = true;  break;        
+        case 'u': case 'U': g_offsetY += MOVE_STEP; break;     
+        case 'd': case 'D': g_offsetY -= MOVE_STEP; break;      
+        case 'l': case 'L': g_offsetX -= MOVE_STEP; break;     
+        case 'r': case 'R': g_offsetX += MOVE_STEP; break;     
+        case '+': g_zoom += ZOOM_STEP; break;          
+        case '-': g_zoom = (g_zoom > ZOOM_STEP) ?             
                            g_zoom - ZOOM_STEP : ZOOM_STEP; break;
-        case 27: exit(0); break;                                 // ESC
+        case 27: exit(0); break;                         
     }
     glutPostRedisplay();
 }
 
-// -----------------------------------------------------------------------------
-// main
-// -----------------------------------------------------------------------------
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
